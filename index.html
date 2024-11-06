@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lab5</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    #fetchDataButton {
+      margin: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #fetchDataButton:hover {
+      background-color: #45a049;
+    }
+    #result {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      max-width: 1200px;
+    }
+    .user-card {
+      flex: 1 1 200px;
+      max-width: 200px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+    .user-card img {
+      width: 100%;
+      border-radius: 50%;
+    }
+    .user-card p {
+      margin: 8px 0;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <button id="fetchDataButton">Download</button>
+  <div id="result"></div>
+
+  <script>
+    // Функція для отримання даних і виведення їх на сторінку
+    function fetchData() {
+      const resultElement = document.getElementById('result');
+      
+      // Очищаємо контейнер, видаляючи його тимчасово зі сторінки
+      resultElement.remove();
+
+      // Створюємо новий контейнер і додаємо його знову
+      const newResultElement = document.createElement('div');
+      newResultElement.id = 'result';
+      newResultElement.style.display = 'flex';  // Встановлюємо відображення
+      document.body.appendChild(newResultElement);
+
+      // Тепер завантажуємо дані
+      fetch('https://randomuser.me/api/?results=5')
+        .then(response => response.json())
+        .then(data => {
+          data.results.forEach(userData => {
+            const picture = userData.picture.large;
+            const name = `${userData.name.first} ${userData.name.last}`;
+            const city = userData.location.city;
+            const country = userData.location.country;
+            const postcode = userData.location.postcode;
+            const email = userData.email;
+
+            const userCard = document.createElement('div');
+            userCard.classList.add('user-card');
+            userCard.innerHTML = `
+              <img src="${picture}" alt="Фото користувача">
+              <p><strong>Ім'я:</strong> ${name}</p>
+              <p><strong>Місто:</strong> ${city}</p>
+              <p><strong>Країна:</strong> ${country}</p>
+              <p><strong>Поштовий індекс:</strong> ${postcode}</p>
+              <p><strong>Email:</strong> ${email}</p>
+            `;
+            newResultElement.appendChild(userCard);
+          });
+        })
+        .catch(error => {
+          console.error('Помилка при отриманні даних:', error);
+          newResultElement.innerHTML = `<p>Не вдалося отримати інформацію про користувачів.</p>`;
+        });
+    }
+
+    // Додаємо обробник події для кнопки
+    document.getElementById('fetchDataButton').addEventListener('click', fetchData);
+  </script>
+</body>
+</html>
